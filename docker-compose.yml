@@ -1,0 +1,188 @@
+version: '3.8'
+
+services:
+  # Jitsi Meet services (assumed to be running)
+  # jitsi-web:
+  # jitsi-prosody:
+  # jitsi-jicofo:
+  # jitsi-jvb:
+  
+  # Multitrack Recorder
+  multitrack-recorder:
+    image: jitsi/multitrack-recorder:latest
+    container_name: jitsi-docker_multitrack_recorder
+    environment:
+      - XMPP_SERVER=prosody
+      - XMPP_DOMAIN=meet.jitsi
+      - XMPP_RECORDER_USER=recorder
+      - XMPP_RECORDER_PASSWORD=recorderpass
+      - RECORDING_DIR=/recordings
+    volumes:
+      - ./recordings:/recordings
+      - ./logs:/logs
+    networks:
+      - frontend-official-staging
+    depends_on:
+      - prosody
+
+  # Prosody XMPP Server with Event Sync
+  prosody:
+    image: jitsi/prosody:latest
+    container_name: jitsi-docker-prosody-1
+    environment:
+      - ENABLE_GUESTS=1
+      - ENABLE_EVENT_SYNC=1
+      - EVENT_SYNC_URL=http://pipeline:9090/events
+    volumes:
+      - ./prosody/config:/config
+      - ./prosody/plugins:/prosody-plugins-custom
+      - ./logs:/logs
+    networks:
+      - frontend-official-staging
+
+  # Parakeet ASR Service
+  parakeet-asr:
+    image: shadowfita/parakeet-tdt-0.6b-v2-fastapi:latest
+    container_name: official-staging-parakeet-asr-parakeet-asr
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=/models/parakeet-tdt-0.6b-v2
+      - CUDA_VISIBLE_DEVICES=0  # Remove if CPU only
+    volumes:
+      - ./models:/models
+    networks:
+      - frontend-official-staging
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]  # Remove for CPU deployment
+
+  # Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: official-staging-ollama-llm
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama:/root/.ollama
+    networks:
+      - frontend-official-staging
+    environment:
+      - OLLAMA_MODELS=/root/.ollama/models
+    # Pull model on startup
+    command: serve
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Transcription Pipeline
+  pipeline:
+    build: ./pipeline
+    container_name: telehealth-transcription-pipeline
+    environment:
+      - PARAKEET_WS_URL=ws://parakeet-asr:8000/ws/transcribe
+      - OLLAMA_API_URL=http://ollama:11434/api/generate
+      - OLLAMA_MODEL=llama3.2:3b
+      - PROSODY_API_URL=http://prosody:5280/event_sync
+      - OPENEMR_API_URL=http://openemr:80/apis/default/api
+      - OPENEMR_API_KEY=${OPENEMR_API_KEY:-}
+      - PATIENT_ID=${PATIENT_ID:-}
+      - SHARED_NOTES_DIR=/shared/notes
+    volumes:
+      - ./recordings:/recordings
+      - ./logs:/logs
+      - ./shared:/shared
+    networks:
+      - frontend-official-staging
+    depends_on:
+      - parakeet-asr
+      - ollama
+      - prosody
+
+  # Nginx Proxy Manager
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: official-staging-proxy-proxy-1
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"  # Admin interface
+    environment:
+      - DISABLE_IPV6=true
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - frontend-official-staging
+
+  # OpenEMR (optional)
+  openemr:
+    image: openemr/openemr:latest
+    container_name: official-staging-openemr-1
+    ports:
+      - "8080:80"
+      - "8443:443"
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_ROOT_PASS=root
+      - MYSQL_USER=openemr
+      - MYSQL_PASS=openemr
+      - OE_USER=admin
+      - OE_PASS=pass
+    volumes:
+      - ./openemr/sites:/var/www/localhost/htdocs/openemr/sites
+      - ./shared/notes:/var/www/localhost/htdocs/openemr/documents/telehealth
+    networks:
+      - frontend-official-staging
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mariadb:10.11
+    container_name: openemr-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=openemr
+      - MYSQL_USER=openemr
+      - MYSQL_PASSWORD=openemr
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      - frontend-official-staging
+
+  # Model initialization helper
+  model-init:
+    image: ollama/ollama:latest
+    container_name: model-initializer
+    networks:
+      - frontend-official-staging
+    depends_on:
+      - ollama
+    entrypoint: >
+      sh -c "
+        sleep 10 &&
+        ollama pull llama3.2:3b &&
+        echo 'Model initialized'
+      "
+    restart: "no"
+
+networks:
+  frontend-official-staging:
+    external: true
+
+volumes:
+  recordings:
+  logs:
+  models:
+  ollama:
+  shared:
+  npm-data:
+  npm-letsencrypt:
+  openemr-sites:
+  mysql:
