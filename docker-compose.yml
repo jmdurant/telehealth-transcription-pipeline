@@ -88,7 +88,7 @@ services:
     environment:
       - PARAKEET_WS_URL=ws://parakeet-asr:8000/ws/transcribe
       - OLLAMA_API_URL=http://ollama:11434/api/generate
-      - OLLAMA_MODEL=deepseek-r1:14b
+      - OLLAMA_MODEL=gpt-oss:20b
       - PROSODY_API_URL=http://prosody:5280/event_sync
       - OPENEMR_API_URL=http://openemr:80/apis/default/api
       - OPENEMR_API_KEY=${OPENEMR_API_KEY:-}
@@ -167,7 +167,7 @@ services:
     entrypoint: >
       sh -c "
         sleep 10 &&
-        ollama pull deepseek-r1:14b &&
+        ollama pull gpt-oss:20b &&
         echo 'Model initialized'
       "
     restart: "no"
