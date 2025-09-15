@@ -25,7 +25,7 @@ services:
       - TELESALUD_CONTAINER=${TELESALUD_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-telehealth-web-1}
       - PARAKEET_WS_URL=ws://${PARAKEET_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-parakeet-asr-parakeet-asr}:8000/ws/transcribe
       - OLLAMA_API_URL=http://${OLLAMA_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-ollama-llm}:11434/api/generate
-      - OLLAMA_MODEL=llama3.2:3b
+      - OLLAMA_MODEL=deepseek-r1:14b
       - TELESALUD_API_BASE_URL=http://${TELESALUD_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-telehealth-web-1}
       - TELESALUD_API_TOKEN=${TELESALUD_API_TOKEN}
       - METADATA_DIR=/shared/consultations
@@ -60,7 +60,7 @@ services:
       - PROSODY_CONTAINER=${PROSODY_CONTAINER:-jitsi-docker-prosody-1}
       - PARAKEET_WS_URL=ws://${PARAKEET_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-parakeet-asr-parakeet-asr}:8000/ws/transcribe
       - OLLAMA_API_URL=http://${OLLAMA_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-ollama-llm}:11434/api/generate
-      - OLLAMA_MODEL=llama3.2:3b
+      - OLLAMA_MODEL=deepseek-r1:14b
       - PROSODY_API_URL=http://${PROSODY_CONTAINER:-jitsi-docker-prosody-1}:5280/event_sync
       - TELESALUD_API_BASE_URL=http://${TELESALUD_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-telehealth-web-1}
       - TELESALUD_API_TOKEN=${TELESALUD_API_TOKEN}

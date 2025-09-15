@@ -100,7 +100,7 @@ docker-compose -f docker-compose.pipeline.yml logs -f
 If you need to initialize the Ollama model:
 ```bash
 # Run this on the existing Ollama container
-docker exec official-staging-ollama-llm ollama pull llama3.2:3b
+docker exec official-staging-ollama-llm ollama pull deepseek-r1:14b
 ```
 
 ### 4. Configure Telesalud Webhooks
@@ -251,7 +251,7 @@ environment:
 
 ```yaml
 environment:
-  - OLLAMA_MODEL=llama3.2:3b  # Can use other models
+  - OLLAMA_MODEL=deepseek-r1:14b  # Can use other models
 ```
 
 ### Recording Directory Structure
