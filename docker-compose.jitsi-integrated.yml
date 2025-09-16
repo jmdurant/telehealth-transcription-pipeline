@@ -1,5 +1,3 @@
-version: '3.8'
-
 # This configuration integrates the pipeline directly with Jitsi's multitrack recorder
 # The finalize script is called automatically when recording completes
 

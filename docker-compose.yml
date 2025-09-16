@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Jitsi Meet services (assumed to be running)
   # jitsi-web:

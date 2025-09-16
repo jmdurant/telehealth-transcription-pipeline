@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Transcription Pipeline - the only new service we're adding
   pipeline:
