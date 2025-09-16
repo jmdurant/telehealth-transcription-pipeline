@@ -33,7 +33,7 @@ services:
     volumes:
       - ./shared:/shared  # Shared directory for logs/state
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     depends_on:
       - parakeet-asr  # Depends on existing Parakeet service
     restart: unless-stopped
@@ -58,7 +58,7 @@ services:
   #   # ports: ["80:80"]
 
 networks:
-  frontend-official-staging:
+  ${DOCKER_NETWORK:-frontend-official-production}:
     external: true
 
 # Health check script for monitoring

@@ -2,6 +2,21 @@
 # The finalize script is called automatically when recording completes
 
 services:
+  # Prosody XMPP Server (required for speaker identification)
+  prosody:
+    image: jitsi/prosody:latest
+    container_name: jitsi-docker-prosody-1
+    environment:
+      - ENABLE_GUESTS=1
+      - ENABLE_EVENT_SYNC=1
+      - EVENT_SYNC_URL=http://pipeline:9090/events
+    volumes:
+      - ./prosody/config:/config
+      - ./prosody/plugins:/prosody-plugins-custom
+      - ./logs:/logs
+    networks:
+      - ${DOCKER_NETWORK:-frontend-official-production}
+
   # Multitrack Recorder with integrated pipeline
   multitrack-recorder:
     image: jitsi/multitrack-recorder:latest
@@ -33,7 +48,7 @@ services:
       - ./shared:/shared
       - ./pipeline:/pipeline:ro  # Mount pipeline scripts as read-only
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     depends_on:
       - prosody
     restart: unless-stopped
@@ -77,7 +92,7 @@ services:
       - ./logs:/logs
       - ./shared:/shared
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     command: >
       sh -c "
         echo '[🔧] Pipeline running in ${INTEGRATION_MODE:-dual} mode';
@@ -90,5 +105,5 @@ services:
       "
 
 networks:
-  frontend-official-staging:
+  ${DOCKER_NETWORK:-frontend-official-production}:
     external: true

@@ -35,7 +35,7 @@ services:
       - ./logs:/logs
       - ./shared:/shared
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     command: >
       sh -c "
         python3 /pipeline/webhook_handler.py &
@@ -43,5 +43,5 @@ services:
       "
 
 networks:
-  frontend-official-staging:
+  ${DOCKER_NETWORK:-frontend-official-production}:
     external: true

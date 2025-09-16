@@ -19,7 +19,7 @@ services:
       - ./recordings:/recordings
       - ./logs:/logs
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     depends_on:
       - prosody
 
@@ -36,7 +36,7 @@ services:
       - ./prosody/plugins:/prosody-plugins-custom
       - ./logs:/logs
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
 
   # Parakeet ASR Service
   parakeet-asr:
@@ -50,7 +50,7 @@ services:
     volumes:
       - ./models:/models
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     deploy:
       resources:
         reservations:
@@ -68,7 +68,7 @@ services:
     volumes:
       - ./ollama:/root/.ollama
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     environment:
       - OLLAMA_MODELS=/root/.ollama/models
     # Pull model on startup
@@ -97,7 +97,7 @@ services:
       - ./logs:/logs
       - ./shared:/shared
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     depends_on:
       - parakeet-asr
       - ollama
@@ -117,7 +117,7 @@ services:
       - ./npm/data:/data
       - ./npm/letsencrypt:/etc/letsencrypt
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
 
   # OpenEMR (optional)
   openemr:
@@ -137,7 +137,7 @@ services:
       - ./openemr/sites:/var/www/localhost/htdocs/openemr/sites
       - ./shared/notes:/var/www/localhost/htdocs/openemr/documents/telehealth
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     depends_on:
       - mysql
 
@@ -152,14 +152,14 @@ services:
     volumes:
       - ./mysql:/var/lib/mysql
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
 
   # Model initialization helper
   model-init:
     image: ollama/ollama:latest
     container_name: model-initializer
     networks:
-      - frontend-official-staging
+      - ${DOCKER_NETWORK:-frontend-official-production}
     depends_on:
       - ollama
     entrypoint: >
@@ -171,7 +171,7 @@ services:
     restart: "no"
 
 networks:
-  frontend-official-staging:
+  ${DOCKER_NETWORK:-frontend-official-production}:
     external: true
 
 volumes:
