@@ -1,0 +1,54 @@
+services:
+  # Transcription Pipeline - based on repository's docker-compose.pipeline.yml
+  transcription-pipeline:
+    build: ./pipeline
+    container_name: ${COMPOSE_PROJECT_NAME}-transcription-pipeline
+    ports:
+      - "${TRANSCRIPTION_PORT:-9090}:9090"  # Webhook handler port
+    env_file: .env
+    environment:
+      - PROJECT=${PROJECT:-aiotp}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DOMAIN_BASE=${DOMAIN_BASE:-localhost}
+      - PARAKEET_CONTAINER=${PARAKEET_CONTAINER}
+      - OLLAMA_CONTAINER=${OLLAMA_CONTAINER}
+      - TELESALUD_CONTAINER=${TELESALUD_CONTAINER}
+      - OPENEMR_CONTAINER=${OPENEMR_CONTAINER}
+      - PROSODY_CONTAINER=${PROSODY_CONTAINER}
+      - PARAKEET_WS_URL=${PARAKEET_WS_URL}
+      - OLLAMA_API_URL=${OLLAMA_API_URL}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2:3b}
+      - PROSODY_API_URL=${PROSODY_API_URL}
+      - TELESALUD_API_BASE_URL=${TELESALUD_API_BASE_URL}
+      - TELESALUD_API_TOKEN=${TELESALUD_API_TOKEN}
+      - TELESALUD_API_URL=${TELESALUD_API_URL}
+      - TELESALUD_WEBHOOK_URL=${TELESALUD_WEBHOOK_URL}
+      - USE_WEBHOOK=${USE_WEBHOOK:-true}
+      - OPENEMR_API_URL=${OPENEMR_API_URL}
+      - OPENEMR_API_KEY=${OPENEMR_API_KEY:-}
+      - WEBHOOK_PORT=${WEBHOOK_PORT:-9090}
+      - WEBHOOK_HOST=${WEBHOOK_HOST:-0.0.0.0}
+      - WEBHOOK_TOKEN=${WEBHOOK_TOKEN}
+      - METADATA_DIR=${METADATA_DIR:-/shared/consultations}
+      - SHARED_NOTES_DIR=${SHARED_NOTES_DIR:-/shared/notes}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - ./recordings:/recordings
+      - ./logs:/logs
+      - ./shared:/shared
+    restart: unless-stopped
+    networks:
+      - frontend
+      - proxy
+    entrypoint: ["sh", "-c"]
+    command: >
+      "python3 /pipeline/webhook_handler.py &
+      sleep infinity"
+
+networks:
+  frontend:
+    external: true
+    name: ${FRONTEND_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK} 

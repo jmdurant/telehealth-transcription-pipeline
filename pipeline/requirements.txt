@@ -1,0 +1,4 @@
+# Minimal dependencies - audio processing handled by ffmpeg and Parakeet
+requests==2.31.0         # API calls to telesalud/OpenEMR
+websocket-client==1.6.4  # WebSocket client for Parakeet
+flask==3.0.0             # Webhook server

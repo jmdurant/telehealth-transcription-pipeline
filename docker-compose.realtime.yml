@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # Real-Time Clinical Assistant - NEW SERVICE
+  realtime-assistant:
+    build: ./realtime-assistant
+    container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-realtime-assistant
+    ports:
+      - "9091:9091"  # WebSocket server for telesalud
+    environment:
+      # Environment configuration
+      - PROJECT=${PROJECT:-official}
+      - ENVIRONMENT=${ENVIRONMENT:-staging}
+      - DOMAIN_BASE=${DOMAIN_BASE:-localhost}
+      
+      # Service connections (using existing containers)
+      - PARAKEET_CONTAINER=${PARAKEET_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-parakeet-asr-parakeet-asr}
+      - TELESALUD_CONTAINER=${TELESALUD_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-telehealth-web-1}
+      
+      # Real-time assistant configuration
+      - REALTIME_PORT=9091
+      - REALTIME_HOST=0.0.0.0
+      
+      # Parakeet integration (connects to existing Parakeet WebSocket)
+      - PARAKEET_WS_URL=ws://${PARAKEET_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-parakeet-asr-parakeet-asr}:8000/ws
+      
+      # Telesalud API integration (secure authentication)
+      - TELESALUD_API_BASE_URL=http://${TELESALUD_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-telehealth-web-1}
+      - TELESALUD_API_TOKEN=${TELESALUD_API_TOKEN}
+      
+      # Logging and debugging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - PYTHONUNBUFFERED=1
+      
+    volumes:
+      - ./shared:/shared  # Shared directory for logs/state
+    networks:
+      - frontend-official-production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import asyncio, websockets; asyncio.run(websockets.connect('ws://localhost:9091'))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Reference to existing services (they should already be running)
+  # These are just for documentation - DO NOT START THESE if they're already running
+  
+  # parakeet-asr:
+  #   # This should already be running from your main stack
+  #   # container_name: official-staging-parakeet-asr-parakeet-asr
+  #   # ports: ["8000:8000"]
+  
+  # telesalud-web:
+  #   # This should already be running from your main stack  
+  #   # container_name: official-staging-telehealth-web-1
+  #   # ports: ["80:80"]
+
+networks:
+  frontend-official-production:
+    external: true
+
+# Health check script for monitoring
+x-healthcheck-template: &healthcheck
+  test: ["CMD-SHELL", "curl -f http://localhost:9091/health || exit 1"]
+  interval: 30s
+  timeout: 10s
+  retries: 3
+  start_period: 20s

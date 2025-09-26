@@ -1,0 +1,48 @@
+# Recordings and outputs
+recordings/
+logs/
+shared/
+
+# Model files
+models/
+ollama/
+
+# Database files
+mysql/
+openemr/sites/
+
+# NPM data
+npm/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
