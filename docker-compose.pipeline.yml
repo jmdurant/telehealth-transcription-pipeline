@@ -4,7 +4,7 @@ services:
     build: ./pipeline
     container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-transcription-pipeline
     ports:
-      - "9090:9090"  # Webhook handler port
+      - "9091:9091"  # Webhook handler port
     environment:
       - PROJECT=${PROJECT:-official}
       - ENVIRONMENT=${ENVIRONMENT:-staging}
@@ -25,7 +25,7 @@ services:
       - USE_WEBHOOK=${USE_WEBHOOK:-true}
       - OPENEMR_API_URL=http://${OPENEMR_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-openemr-1}:80/apis/default/api
       - OPENEMR_API_KEY=${OPENEMR_API_KEY:-}
-      - WEBHOOK_PORT=9090
+      - WEBHOOK_PORT=9091
       - WEBHOOK_HOST=0.0.0.0
       - WEBHOOK_TOKEN=${WEBHOOK_TOKEN:-}
       - METADATA_DIR=/shared/consultations

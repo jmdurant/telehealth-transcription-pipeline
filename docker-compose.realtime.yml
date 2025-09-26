@@ -6,7 +6,7 @@ services:
     build: ./realtime-assistant
     container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-realtime-assistant
     ports:
-      - "9091:9091"  # WebSocket server for telesalud
+      - "9092:9092"  # WebSocket server for telesalud
     environment:
       # Environment configuration
       - PROJECT=${PROJECT:-official}
@@ -18,7 +18,7 @@ services:
       - TELESALUD_CONTAINER=${TELESALUD_CONTAINER:-${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-telehealth-web-1}
       
       # Real-time assistant configuration
-      - REALTIME_PORT=9091
+      - REALTIME_PORT=9092
       - REALTIME_HOST=0.0.0.0
       
       # Parakeet integration (connects to existing Parakeet WebSocket)
@@ -38,7 +38,7 @@ services:
       - frontend-official-production
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "import asyncio, websockets; asyncio.run(websockets.connect('ws://localhost:9091'))"]
+      test: ["CMD", "python", "-c", "import asyncio, websockets; asyncio.run(websockets.connect('ws://localhost:9092'))"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -63,7 +63,7 @@ networks:
 
 # Health check script for monitoring
 x-healthcheck-template: &healthcheck
-  test: ["CMD-SHELL", "curl -f http://localhost:9091/health || exit 1"]
+  test: ["CMD-SHELL", "curl -f http://localhost:9092/health || exit 1"]
   interval: 30s
   timeout: 10s
   retries: 3
