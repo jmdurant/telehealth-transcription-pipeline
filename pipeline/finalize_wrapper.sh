@@ -72,18 +72,10 @@ cat > "$METADATA_DIR/${CONSULTATION_ID}_processing.json" <<EOF
 }
 EOF
 
-# Call the appropriate finalize script based on configuration
-AUDIO_PROCESSING_MODE="${AUDIO_PROCESSING_MODE:-auto}"
-
-if [ -f "/pipeline/finalize_with_fallback.sh" ] && [ "$AUDIO_PROCESSING_MODE" != "legacy" ]; then
-    echo "[🚀] Executing enhanced pipeline with fallback support..."
-    /pipeline/finalize_with_fallback.sh "$RECORDING_DIR"
-    RESULT=$?
-else
-    echo "[🚀] Executing standard pipeline..."
-    /pipeline/finalize.sh "$RECORDING_DIR"
-    RESULT=$?
-fi
+# Call the actual finalize script
+echo "[🚀] Executing finalize.sh pipeline..."
+/pipeline/finalize.sh "$RECORDING_DIR"
+RESULT=$?
 
 # Update processing status
 if [ $RESULT -eq 0 ]; then
