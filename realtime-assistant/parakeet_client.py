@@ -7,19 +7,26 @@ import asyncio
 import websockets
 import json
 import logging
+import os
 from typing import Optional, Callable, Any
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
+# Default Parakeet URL from environment
+DEFAULT_PARAKEET_URL = os.environ.get("PARAKEET_WS_URL", "ws://parakeet-asr:8000/ws")
+
 class ParakeetWebSocketClient:
     """Client for connecting to Parakeet's WebSocket transcription service"""
     
-    def __init__(self, parakeet_url: str = "ws://parakeet-asr:8000/ws"):
-        self.parakeet_url = parakeet_url
+    def __init__(self, parakeet_url: str = None):
+        self.parakeet_url = parakeet_url or DEFAULT_PARAKEET_URL
         self.websocket = None
         self.is_connected = False
         self.transcription_callback = None
+        self.reconnect_attempts = 0
+        self.max_reconnect_attempts = 5
+        self.reconnect_delay = 2  # seconds
         
     def set_transcription_callback(self, callback: Callable[[str, float], None]):
         """Set callback function to handle transcription results"""
@@ -63,20 +70,43 @@ class ParakeetWebSocketClient:
             self.is_connected = False
     
     async def listen_for_transcriptions(self):
-        """Listen for transcription results from Parakeet"""
-        if not self.is_connected or not self.websocket:
-            logger.warning("Not connected to Parakeet WebSocket")
-            return
+        """Listen for transcription results from Parakeet with auto-reconnect"""
+        while True:
+            if not self.is_connected or not self.websocket:
+                if not await self._try_reconnect():
+                    logger.error("Failed to reconnect to Parakeet, stopping listener")
+                    return
+            
+            try:
+                async for message in self.websocket:
+                    self.reconnect_attempts = 0  # Reset on successful message
+                    await self.handle_transcription_message(message)
+            except websockets.exceptions.ConnectionClosed:
+                logger.warning("Parakeet WebSocket connection closed, attempting reconnect...")
+                self.is_connected = False
+            except Exception as e:
+                logger.error(f"Error listening for transcriptions: {e}")
+                self.is_connected = False
+    
+    async def _try_reconnect(self) -> bool:
+        """Attempt to reconnect to Parakeet WebSocket"""
+        if self.reconnect_attempts >= self.max_reconnect_attempts:
+            logger.error(f"Max reconnect attempts ({self.max_reconnect_attempts}) reached")
+            return False
+        
+        self.reconnect_attempts += 1
+        delay = self.reconnect_delay * self.reconnect_attempts
+        logger.info(f"Reconnect attempt {self.reconnect_attempts}/{self.max_reconnect_attempts} in {delay}s...")
+        
+        await asyncio.sleep(delay)
         
         try:
-            async for message in self.websocket:
-                await self.handle_transcription_message(message)
-        except websockets.exceptions.ConnectionClosed:
-            logger.info("Parakeet WebSocket connection closed")
-            self.is_connected = False
+            await self.connect()
+            logger.info("Reconnected to Parakeet WebSocket successfully")
+            return True
         except Exception as e:
-            logger.error(f"Error listening for transcriptions: {e}")
-            self.is_connected = False
+            logger.error(f"Reconnect attempt failed: {e}")
+            return False
     
     async def handle_transcription_message(self, message: str):
         """Handle incoming transcription message from Parakeet"""

@@ -174,7 +174,7 @@ def list_consultations():
 
 def run_webhook_server():
     """Run the webhook server"""
-    port = int(os.environ.get('WEBHOOK_PORT', 9090))
+    port = int(os.environ.get('WEBHOOK_PORT', 9091))
     host = os.environ.get('WEBHOOK_HOST', '0.0.0.0')
     
     print(f"[🌐 WEBHOOK] Starting webhook server on {host}:{port}")

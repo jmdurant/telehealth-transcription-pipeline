@@ -35,13 +35,16 @@ services:
       - ./logs:/logs
       - ./shared:/shared
     networks:
-      - ${DOCKER_NETWORK:-frontend-official-production}
-    command: >
-      sh -c "
-        python3 /pipeline/webhook_handler.py &
-        sleep infinity
-      "
+      - frontend-official-production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9091/webhook/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    command: ["python3", "/pipeline/webhook_handler.py"]
 
 networks:
-  ${DOCKER_NETWORK:-frontend-official-production}:
+  frontend-official-production:
     external: true

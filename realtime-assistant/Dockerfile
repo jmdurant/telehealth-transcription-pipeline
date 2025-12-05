@@ -11,6 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /realtime-assistant
 
-EXPOSE 9091
+EXPOSE 9092 9093
 
 ENTRYPOINT ["python", "/realtime-assistant/realtime_assistant.py"]

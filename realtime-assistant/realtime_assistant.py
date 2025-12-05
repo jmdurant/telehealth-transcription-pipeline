@@ -10,6 +10,7 @@ import logging
 import os
 from typing import Dict, Any, Optional
 from datetime import datetime
+from aiohttp import web
 
 # Import our modules
 from conversation_state import session_manager, ConsultationType, periodic_cleanup
@@ -27,7 +28,8 @@ class RealtimeAssistantServer:
     """Main server for real-time clinical assistant"""
     
     def __init__(self):
-        self.port = int(os.environ.get("REALTIME_PORT", 9091))
+        self.port = int(os.environ.get("REALTIME_PORT", 9092))
+        self.http_port = int(os.environ.get("REALTIME_HTTP_PORT", 9093))
         self.host = os.environ.get("REALTIME_HOST", "0.0.0.0")
         self.active_connections = {}  # consultation_id -> websocket
         self.audio_forwarders = {}    # consultation_id -> AudioForwarder
@@ -36,17 +38,43 @@ class RealtimeAssistantServer:
         assistant_engine.add_suggestion_callback(self.send_suggestion_to_telesalud)
     
     async def start_server(self):
-        """Start the WebSocket server"""
+        """Start the WebSocket server and HTTP health check server"""
         logger.info(f"Starting Real-Time Clinical Assistant Server on {self.host}:{self.port}")
+        logger.info(f"Starting HTTP health check server on {self.host}:{self.http_port}")
         
         # Start background tasks
         asyncio.create_task(assistant_engine.start_processing_queue())
         asyncio.create_task(periodic_cleanup())
         
+        # Start HTTP server for health checks
+        asyncio.create_task(self.start_http_server())
+        
         # Start WebSocket server
         async with websockets.serve(self.handle_connection, self.host, self.port):
             logger.info("Real-Time Clinical Assistant Server is running")
             await asyncio.Future()  # Run forever
+    
+    async def start_http_server(self):
+        """Start HTTP server for health checks"""
+        app = web.Application()
+        app.router.add_get('/health', self.http_health_check)
+        app.router.add_get('/sessions', self.http_list_sessions)
+        
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, self.host, self.http_port)
+        await site.start()
+        logger.info(f"HTTP health check server started on {self.host}:{self.http_port}")
+    
+    async def http_health_check(self, request):
+        """HTTP health check endpoint"""
+        status = await self.get_server_status()
+        return web.json_response(status)
+    
+    async def http_list_sessions(self, request):
+        """HTTP endpoint to list active sessions"""
+        sessions = session_manager.get_all_active_sessions()
+        return web.json_response({"sessions": sessions, "count": len(sessions)})
     
     async def handle_connection(self, websocket, path):
         """Handle new WebSocket connection from telesalud"""
@@ -153,11 +181,16 @@ class RealtimeAssistantServer:
                     await self.audio_forwarders[consultation_id].stop()
                     del self.audio_forwarders[consultation_id]
                 
-                # Get session summary
+                # Get session summary and clean up session from manager
                 session = session_manager.get_session(consultation_id)
                 summary = session.get_session_summary() if session else {}
                 
-                # Clean up
+                # Remove session from session manager
+                if consultation_id in session_manager.active_sessions:
+                    del session_manager.active_sessions[consultation_id]
+                    logger.info(f"Removed session {consultation_id} from session manager")
+                
+                # Clean up connection
                 del self.active_connections[consultation_id]
                 
                 # Send confirmation with summary

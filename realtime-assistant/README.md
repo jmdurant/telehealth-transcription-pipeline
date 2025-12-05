@@ -113,7 +113,7 @@ docker-compose -f docker-compose.realtime.yml logs -f realtime-assistant
 ```javascript
 class ClinicalAssistant {
     constructor(consultationId, consultationType) {
-        this.ws = new WebSocket('ws://realtime-assistant:9091');
+        this.ws = new WebSocket('ws://realtime-assistant:9092');
         this.consultationId = consultationId;
         this.consultationType = consultationType;
     }
@@ -159,10 +159,10 @@ class ClinicalAssistant {
 ### **Health Checks**
 ```bash
 # Check real-time assistant health
-curl http://localhost:9091/health
+curl http://localhost:9093/health
 
 # View active sessions
-curl http://localhost:9091/sessions
+curl http://localhost:9093/sessions
 ```
 
 ### **Logs**

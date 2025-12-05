@@ -2,9 +2,9 @@ services:
   # Transcription Pipeline - based on repository's docker-compose.pipeline.yml
   transcription-pipeline:
     build: ./pipeline
-    container_name: ${COMPOSE_PROJECT_NAME}-transcription-pipeline
+    container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-production}-transcription-pipeline
     ports:
-      - "${TRANSCRIPTION_PORT:-9090}:9090"  # Webhook handler port
+      - "${WEBHOOK_PORT:-9091}:${WEBHOOK_PORT:-9091}"  # Webhook handler port
     env_file: .env
     environment:
       - PROJECT=${PROJECT:-aiotp}
@@ -26,7 +26,7 @@ services:
       - USE_WEBHOOK=${USE_WEBHOOK:-true}
       - OPENEMR_API_URL=${OPENEMR_API_URL}
       - OPENEMR_API_KEY=${OPENEMR_API_KEY:-}
-      - WEBHOOK_PORT=${WEBHOOK_PORT:-9090}
+      - WEBHOOK_PORT=${WEBHOOK_PORT:-9091}
       - WEBHOOK_HOST=${WEBHOOK_HOST:-0.0.0.0}
       - WEBHOOK_TOKEN=${WEBHOOK_TOKEN}
       - METADATA_DIR=${METADATA_DIR:-/shared/consultations}
@@ -38,17 +38,49 @@ services:
       - ./shared:/shared
     restart: unless-stopped
     networks:
-      - frontend
-      - proxy
-    entrypoint: ["sh", "-c"]
-    command: >
-      "python3 /pipeline/webhook_handler.py &
-      sleep infinity"
+      - frontend-official-production
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:${WEBHOOK_PORT:-9091}/webhook/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    command: ["python3", "/pipeline/webhook_handler.py"]
+
+  # Real-Time Clinical Assistant
+  realtime-assistant:
+    build: ./realtime-assistant
+    container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-production}-realtime-assistant
+    ports:
+      - "${REALTIME_WS_PORT:-9092}:9092"    # WebSocket server for telesalud
+      - "${REALTIME_HTTP_PORT:-9093}:9093"  # HTTP health check server
+    env_file: .env
+    environment:
+      - PROJECT=${PROJECT:-aiotp}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DOMAIN_BASE=${DOMAIN_BASE:-localhost}
+      - PARAKEET_CONTAINER=${PARAKEET_CONTAINER}
+      - TELESALUD_CONTAINER=${TELESALUD_CONTAINER}
+      - REALTIME_PORT=9092
+      - REALTIME_HTTP_PORT=9093
+      - REALTIME_HOST=0.0.0.0
+      - PARAKEET_WS_URL=${PARAKEET_WS_URL}
+      - TELESALUD_API_BASE_URL=${TELESALUD_API_BASE_URL}
+      - TELESALUD_API_TOKEN=${TELESALUD_API_TOKEN}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./shared:/shared
+    restart: unless-stopped
+    networks:
+      - frontend-official-production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9093/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 networks:
-  frontend:
+  frontend-official-production:
     external: true
-    name: ${FRONTEND_NETWORK}
-  proxy:
-    external: true
-    name: ${PROXY_NETWORK} 
