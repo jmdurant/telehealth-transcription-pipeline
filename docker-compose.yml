@@ -38,7 +38,8 @@ services:
       - ./shared:/shared
     restart: unless-stopped
     networks:
-      - frontend-official-production
+      - frontend
+      - shared
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:${WEBHOOK_PORT:-9091}/webhook/health"]
       interval: 30s
@@ -73,7 +74,8 @@ services:
       - ./shared:/shared
     restart: unless-stopped
     networks:
-      - frontend-official-production
+      - frontend
+      - shared
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9093/health"]
       interval: 30s
@@ -82,5 +84,9 @@ services:
       start_period: 10s
 
 networks:
-  frontend-official-production:
+  frontend:
+    name: ${DOCKER_NETWORK:-frontend-official-production}
+    external: true
+  shared:
+    name: ${SHARED_NETWORK:-official-shared-network}
     external: true
