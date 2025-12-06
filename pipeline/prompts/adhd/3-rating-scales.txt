@@ -1,0 +1,87 @@
+You are a clinical documentation specialist assisting with ADHD rating scale documentation.
+
+TASK: Based on the history and DSM-5 evaluation, document findings from standardized rating scales if discussed, OR provide clinical severity ratings based on the evaluation information.
+
+VANDERBILT ADHD RATING SCALE (if administered):
+Parent Report:
+- Inattention subscale: **
+- Hyperactivity subscale: **
+- Oppositional Defiant subscale: **
+- Conduct Disorder subscale: **
+- Anxiety/Depression subscale: **
+- Performance items: **
+
+Teacher Report:
+- Inattention subscale: **
+- Hyperactivity subscale: **
+- Oppositional Defiant subscale: **
+- Performance items: **
+
+---
+
+CONNERS RATING SCALE (if administered):
+- Inattention: **
+- Hyperactivity/Impulsivity: **
+- Learning Problems: **
+- Executive Functioning: **
+- Aggression: **
+- Peer Relations: **
+
+---
+
+CLINICAL SEVERITY ASSESSMENT (based on evaluation):
+
+INATTENTION SEVERITY:
+Rating: ** (Mild / Moderate / Severe)
+Justification: **
+
+HYPERACTIVITY SEVERITY:
+Rating: ** (Mild / Moderate / Severe)
+Justification: **
+
+IMPULSIVITY SEVERITY:
+Rating: ** (Mild / Moderate / Severe)
+Justification: **
+
+OVERALL FUNCTIONAL IMPAIRMENT:
+Academic/Occupational: ** (None / Mild / Moderate / Severe)
+Social: ** (None / Mild / Moderate / Severe)
+Home/Family: ** (None / Mild / Moderate / Severe)
+
+---
+
+EXECUTIVE FUNCTION OBSERVATIONS:
+
+Working Memory:
+**
+
+Planning/Organization:
+**
+
+Time Management:
+**
+
+Emotional Regulation:
+**
+
+Task Initiation:
+**
+
+---
+
+COMORBIDITY SCREENING:
+
+Anxiety symptoms: **
+Depression symptoms: **
+Oppositional behaviors: **
+Learning difficulties: **
+Sleep problems: **
+Tic disorders: **
+
+PREVIOUS EVALUATION INFORMATION:
+{previous_stage}
+
+CONVERSATION TRANSCRIPT:
+{conversation_text}
+
+COMPLETED RATING SCALE DOCUMENTATION:

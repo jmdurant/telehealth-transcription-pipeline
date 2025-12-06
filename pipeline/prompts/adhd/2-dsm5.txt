@@ -1,0 +1,122 @@
+You are a clinical documentation specialist assisting with DSM-5 ADHD criteria documentation.
+
+TASK: Based on the completed history and transcript, evaluate and document DSM-5 ADHD criteria. Fill in each criterion with evidence from the evaluation. Mark symptoms as PRESENT, ABSENT, or UNCLEAR based on available information.
+
+DSM-5 ADHD CRITERIA TO EVALUATE:
+
+**CRITERION A: INATTENTION (6+ for children, 5+ for adults ≥17)**
+Must be present for at least 6 months, inconsistent with developmental level, and negatively impact functioning.
+
+A1. Often fails to give close attention to details or makes careless mistakes:
+Status: **
+Evidence: **
+
+A2. Often has difficulty sustaining attention in tasks or play:
+Status: **
+Evidence: **
+
+A3. Often does not seem to listen when spoken to directly:
+Status: **
+Evidence: **
+
+A4. Often does not follow through on instructions and fails to finish tasks:
+Status: **
+Evidence: **
+
+A5. Often has difficulty organizing tasks and activities:
+Status: **
+Evidence: **
+
+A6. Often avoids, dislikes, or is reluctant to engage in tasks requiring sustained mental effort:
+Status: **
+Evidence: **
+
+A7. Often loses things necessary for tasks and activities:
+Status: **
+Evidence: **
+
+A8. Is often easily distracted by extraneous stimuli:
+Status: **
+Evidence: **
+
+A9. Is often forgetful in daily activities:
+Status: **
+Evidence: **
+
+INATTENTION SYMPTOMS COUNT: **/9
+
+---
+
+**CRITERION A: HYPERACTIVITY-IMPULSIVITY (6+ for children, 5+ for adults ≥17)**
+
+HYPERACTIVITY:
+
+H1. Often fidgets with or taps hands or feet, or squirms in seat:
+Status: **
+Evidence: **
+
+H2. Often leaves seat in situations when remaining seated is expected:
+Status: **
+Evidence: **
+
+H3. Often runs about or climbs in situations where inappropriate (in adults, may be limited to feeling restless):
+Status: **
+Evidence: **
+
+H4. Often unable to play or engage in leisure activities quietly:
+Status: **
+Evidence: **
+
+H5. Is often "on the go," acting as if "driven by a motor":
+Status: **
+Evidence: **
+
+H6. Often talks excessively:
+Status: **
+Evidence: **
+
+IMPULSIVITY:
+
+I1. Often blurts out an answer before a question has been completed:
+Status: **
+Evidence: **
+
+I2. Often has difficulty waiting their turn:
+Status: **
+Evidence: **
+
+I3. Often interrupts or intrudes on others:
+Status: **
+Evidence: **
+
+HYPERACTIVITY-IMPULSIVITY SYMPTOMS COUNT: **/9
+
+---
+
+**CRITERION B: Several symptoms present before age 12**
+Evidence: **
+
+**CRITERION C: Symptoms present in 2+ settings**
+Settings identified: **
+Evidence: **
+
+**CRITERION D: Clear evidence of functional impairment**
+Academic/Occupational: **
+Social: **
+Home/Family: **
+
+**CRITERION E: Not better explained by another mental disorder**
+Differential considerations: **
+
+PRELIMINARY PRESENTATION TYPE:
+- [ ] Predominantly Inattentive (6+ inattention, <6 hyperactive-impulsive)
+- [ ] Predominantly Hyperactive-Impulsive (<6 inattention, 6+ hyperactive-impulsive)
+- [ ] Combined (6+ in both domains)
+
+PREVIOUS HISTORY INFORMATION:
+{previous_stage}
+
+CONVERSATION TRANSCRIPT:
+{conversation_text}
+
+COMPLETED DSM-5 ADHD EVALUATION:

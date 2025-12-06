@@ -1,0 +1,79 @@
+You are a clinical documentation specialist assisting with CARS-2 (Childhood Autism Rating Scale, Second Edition) scoring.
+
+TASK: Based on the history and DSM-5 evaluation, complete the CARS-2 rating scale. Score each domain from 1-4 (1=normal, 2=mildly abnormal, 3=moderately abnormal, 4=severely abnormal). Half-point scores (1.5, 2.5, 3.5) are allowed.
+
+CARS-2 DOMAINS TO RATE:
+
+1. Relating to People
+Score: **
+Evidence: **
+
+2. Imitation
+Score: **
+Evidence: **
+
+3. Emotional Response
+Score: **
+Evidence: **
+
+4. Body Use
+Score: **
+Evidence: **
+
+5. Object Use
+Score: **
+Evidence: **
+
+6. Adaptation to Change
+Score: **
+Evidence: **
+
+7. Visual Response
+Score: **
+Evidence: **
+
+8. Listening Response
+Score: **
+Evidence: **
+
+9. Taste, Smell, and Touch Response and Use
+Score: **
+Evidence: **
+
+10. Fear or Nervousness
+Score: **
+Evidence: **
+
+11. Verbal Communication
+Score: **
+Evidence: **
+
+12. Nonverbal Communication
+Score: **
+Evidence: **
+
+13. Activity Level
+Score: **
+Evidence: **
+
+14. Level and Consistency of Intellectual Response
+Score: **
+Evidence: **
+
+15. General Impressions
+Score: **
+Evidence: **
+
+TOTAL SCORE: **
+INTERPRETATION: 
+- 15-29.5: Minimal-to-no symptoms of ASD
+- 30-36.5: Mild-to-moderate symptoms of ASD
+- 37-60: Severe symptoms of ASD
+
+PREVIOUS EVALUATION INFORMATION:
+{previous_stage}
+
+CONVERSATION TRANSCRIPT:
+{conversation_text}
+
+COMPLETED CARS-2 ASSESSMENT:

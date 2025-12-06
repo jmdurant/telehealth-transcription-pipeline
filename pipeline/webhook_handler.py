@@ -70,14 +70,14 @@ def trigger_pipeline_async(consultation_id):
     print(f"[🔄] Pipeline triggered in background for {consultation_id}")
 
 def save_event_notification(vc_data, topic):
-    """Save minimal event notification (no patient data for security)"""
+    """Save event notification with metadata for pipeline processing"""
     ensure_metadata_dir()
     
-    consultation_id = vc_data.get('secret')
+    consultation_id = vc_data.get('secret') or vc_data.get('consultation_id')
     if not consultation_id:
         return False
     
-    # Only save minimal event data - no patient information
+    # Build event data
     event_data = {
         'consultation_id': consultation_id,
         'status': vc_data.get('status'),
@@ -87,15 +87,53 @@ def save_event_notification(vc_data, topic):
         'recording_processed': False
     }
     
-    # Save to file
-    filename = f"{consultation_id}_event.json"
+    # Include specialty/prompt_type if provided (for AI note generation)
+    if vc_data.get('specialty'):
+        event_data['specialty'] = vc_data.get('specialty')
+    if vc_data.get('prompt_type'):
+        event_data['prompt_type'] = vc_data.get('prompt_type')
+    if vc_data.get('patient_name'):
+        event_data['patient_name'] = vc_data.get('patient_name')
+    if vc_data.get('medic_name'):
+        event_data['medic_name'] = vc_data.get('medic_name')
+    if vc_data.get('doctor_notes'):
+        event_data['doctor_notes'] = vc_data.get('doctor_notes')
+    
+    # Save to file (use _metadata.json suffix for pipeline compatibility)
+    filename = f"{consultation_id}_metadata.json"
     filepath = os.path.join(METADATA_DIR, filename)
+    
+    # Merge with existing metadata if present
+    if os.path.exists(filepath):
+        try:
+            with open(filepath, 'r') as f:
+                existing = json.load(f)
+            existing.update(event_data)
+            event_data = existing
+        except:
+            pass
     
     with open(filepath, 'w') as f:
         json.dump(event_data, f, indent=2)
     
-    print(f"[📋 WEBHOOK] Saved event notification for consultation {consultation_id}")
+    print(f"[📋 WEBHOOK] Saved metadata for consultation {consultation_id}")
+    if event_data.get('specialty'):
+        print(f"[🎯 SPECIALTY] {event_data.get('specialty')}")
     return True
+
+def handle_consultation_started(data):
+    """Handle consultation started event"""
+    consultation_id = data.get('consultation_id')
+    if not consultation_id:
+        return jsonify({'error': 'No consultation ID provided'}), 400
+    
+    print(f"[📣 CONSULTATION STARTED] {consultation_id}")
+    
+    # Save event notification
+    if save_event_notification(data, 'consultation_started'):
+        return jsonify({'status': 'success', 'message': 'Consultation started event processed'})
+    
+    return jsonify({'error': 'Failed to save event notification'}), 500
 
 @app.route('/webhook/telesalud', methods=['POST'])
 def handle_telesalud_webhook():
@@ -112,6 +150,12 @@ def handle_telesalud_webhook():
         if not data:
             return jsonify({'error': 'No JSON data provided'}), 400
         
+        # Handle new event-based format (from evolution.blade.php)
+        event = data.get('event')
+        if event == 'consultation_started':
+            return handle_consultation_started(data.get('data', {}))
+        
+        # Handle legacy format
         vc_data = data.get('vc', {})
         topic = data.get('topic', '')
         

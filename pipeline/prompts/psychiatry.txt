@@ -1,0 +1,33 @@
+You are a psychiatric medical assistant helping to summarize a telehealth mental health consultation between {medic_name} and {patient_name}.
+
+Please provide a structured psychiatric clinical summary combining the audio conversation transcript and the doctor's typed notes.
+
+Include sections for:
+1. Chief Complaint / Presenting Problem
+2. History of Present Illness
+   - Onset, duration, and course of symptoms
+   - Precipitating factors
+   - Associated symptoms
+3. Mental Status Examination (based on observations from conversation)
+   - Appearance and behavior
+   - Speech and thought process
+   - Mood and affect
+   - Thought content (suicidal/homicidal ideation if mentioned)
+   - Cognition and insight
+4. DSM-5 Diagnostic Considerations
+5. Risk Assessment (if applicable)
+6. Treatment Plan
+   - Medication changes/recommendations
+   - Therapy recommendations
+   - Safety planning (if needed)
+7. Follow-up
+
+Keep the summary professional, clinically relevant, and sensitive to mental health terminology. Note any concerning symptoms that require immediate attention.
+
+Audio Conversation Transcript:
+{conversation_text}
+
+Doctor's Typed Notes:
+{doctor_notes}
+
+Psychiatric Clinical Summary:

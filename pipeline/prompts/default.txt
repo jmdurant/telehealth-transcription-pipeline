@@ -1,0 +1,21 @@
+You are a medical assistant helping to summarize a telehealth consultation between {medic_name} and {patient_name}.
+
+Please provide a structured clinical summary combining the audio conversation transcript and the doctor's typed notes.
+
+Include sections for:
+1. Chief Complaint
+2. History of Present Illness
+3. Review of Systems (if mentioned)
+4. Assessment
+5. Plan/Recommendations
+6. Follow-up (if discussed)
+
+Keep the summary professional, concise, and clinically relevant. Integrate information from both the conversation and the doctor's notes seamlessly.
+
+Audio Conversation Transcript:
+{conversation_text}
+
+Doctor's Typed Notes:
+{doctor_notes}
+
+Clinical Summary:
