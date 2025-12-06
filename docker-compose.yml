@@ -31,11 +31,14 @@ services:
       - WEBHOOK_TOKEN=${WEBHOOK_TOKEN}
       - METADATA_DIR=${METADATA_DIR:-/shared/consultations}
       - SHARED_NOTES_DIR=${SHARED_NOTES_DIR:-/shared/notes}
+      - RECORDINGS_DIR=/data
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
     volumes:
       - ./recordings:/recordings
       - ./logs:/logs
       - ./shared:/shared
+      # Mount Jitsi recordings for speaker mapping (same as multitrack recorder)
+      - ${JITSI_RECORDINGS_DIR:-/home/docto/telesalud/jitsi-docker/.jitsi-meet-cfg/recordings}:/data
     restart: unless-stopped
     networks:
       - frontend
