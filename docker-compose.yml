@@ -2,7 +2,7 @@ services:
   # Transcription Pipeline - based on repository's docker-compose.pipeline.yml
   transcription-pipeline:
     build: ./pipeline
-    container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-production}-transcription-pipeline
+    container_name: ${PROJECT}-${ENVIRONMENT}-transcription-pipeline
     ports:
       - "${WEBHOOK_PORT:-9091}:${WEBHOOK_PORT:-9091}"  # Webhook handler port
     env_file: .env
@@ -54,7 +54,7 @@ services:
   # Real-Time Clinical Assistant
   realtime-assistant:
     build: ./realtime-assistant
-    container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-production}-realtime-assistant
+    container_name: ${PROJECT}-${ENVIRONMENT}-realtime-assistant
     ports:
       - "${REALTIME_WS_PORT:-9092}:9092"    # WebSocket server for telesalud
       - "${REALTIME_HTTP_PORT:-9093}:9093"  # HTTP health check server

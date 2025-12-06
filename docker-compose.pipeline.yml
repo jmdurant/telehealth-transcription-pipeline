@@ -2,7 +2,7 @@ services:
   # Transcription Pipeline - the only new service we're adding
   pipeline:
     build: ./pipeline
-    container_name: ${PROJECT:+${PROJECT}-}${ENVIRONMENT:-staging}-transcription-pipeline
+    container_name: ${PROJECT}-${ENVIRONMENT}-transcription-pipeline
     ports:
       - "9091:9091"  # Webhook handler port
     environment:
